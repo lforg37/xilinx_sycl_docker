@@ -28,12 +28,12 @@ RUN python configure.py
 RUN apt-get install -y 
 RUN python compile.py
 
-FROM ubuntu:latest
+FROM uptodate_ubuntu
 COPY --from=build_xrt /xilinx_xrt_amd64.deb /xilinx_xrt_amd64.deb
 COPY --from=install_vitis /xilinx /xilinx
 COPY --from=sycl_compile /xilinx_sycl /xilinx_sycl
 ENV SYCL_HOME=/xilinx_sycl XILINX_VERSION=2020.1 XILINX_PLATFORM=xilinx_u200_xdma_201830_2 XILINX_ROOT=/xilinx SYCL_BIN_DIR=$SYCL_HOME/build/bin XILINX_VITIS=$XILINX_ROOT/Vitis/$XILINX_VERSION XILINX_VIVADO=$XILINX_ROOT/Vivado/$XILINX_VERSION PATH=$PATH:$SYCL_BIN_DIR:$XILINX_VITIS/bin:$XILINX_VIVADO/bin LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$SYCL_HOME/build/lib
 COPY ./install_files/xilinx-u200-xdma-201830.2-2580015_18.04.deb /deb_install/xilinx-u200-xdma-201830.2-2580015_18.04.deb 
 COPY ./install_files/xilinx-u200-xdma-201830.2-dev-2580015_18.04.deb /deb_install/xilinx-u200-xdma-201830.2-dev-2580015_18.04.deb
-RUN apt install /deb_install/xilinx-u200-xdma-201830.2-2580015_18.04.deb /deb_install/xilinx-u200-xdma-201830.2-dev-2580015_18.04.deb
+RUN apt install -y /xilinx_xrt_amd64.deb /deb_install/xilinx-u200-xdma-201830.2-2580015_18.04.deb /deb_install/xilinx-u200-xdma-201830.2-dev-2580015_18.04.deb
 
