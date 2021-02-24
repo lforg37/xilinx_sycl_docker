@@ -20,12 +20,14 @@ COPY ./install_files/install_config.txt /install_config.txt
 COPY expect_script.us /expect_script.us
 RUN --mount=type=secret,id=xilid --mount=type=secret,id=xilpasswd expect /expect_script.us 
 
-FROM uptodate_ubuntu as sycl_compile
+FROM uptodate_ubuntu as sycl_conf
 RUN apt-get install -y git cmake python python3 pkg-config ninja-build g++ opencl-headers ocl-icd-opencl-dev libboost-all-dev
-RUN git clone --depth=1 --branch sycl/unified/next https://github.com/triSYCL/sycl.git xilinx_sycl 
+#RUN git clone --depth=1 --branch sycl/unified/next https://github.com/triSYCL/sycl.git xilinx_sycl 
+RUN git clone --depth=1 --branch FixMerge2 https://github.com/Ralender/sycl.git /xilinx_sycl
 WORKDIR /xilinx_sycl/buildbot
 RUN python configure.py
-RUN apt-get install -y 
+
+FROM sycl_conf as sycl_compile
 RUN python compile.py
 
 FROM uptodate_ubuntu
