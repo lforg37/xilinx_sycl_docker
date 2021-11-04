@@ -3,13 +3,9 @@ set xil_username [exec cat /run/secrets/xilid ]
 set xil_password [exec cat /run/secrets/xilpasswd ]
 
 puts "Generating xilinx authentication token:"
-puts "$xil_username $xil_password"
-spawn /Xilinx_Unified_2020.1_0602_1208_Lin64.bin -- -b AuthTokenGen 
-expect "User ID:"
+spawn /Xilinx_Unified_2021.2_1021_0703_Lin64.bin -- -b AuthTokenGen 
+expect "E-mail Address:"
 send "$xil_username\n"
 expect "Password:"
 send "$xil_password\n"
-expect eof
-
-spawn /Xilinx_Unified_2020.1_0602_1208_Lin64.bin -- -b Install -c /install_config.txt /xilinx --agree 3rdPartyEULA,WebTalkTerms,XilinxEULA 
 expect eof
