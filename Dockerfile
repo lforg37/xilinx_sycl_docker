@@ -24,9 +24,13 @@ RUN mkdir /tmp_clone ;\
     cd XRT/build ;\
     ../src/runtime_src/tools/scripts/xrtdeps.sh -docker ;\
     ./build.sh -opt ;\
-    mv ./Release/xrt_*-amd64-xrt.deb xrt_amd64.deb ;\
-    apt-get install -y xrt_amd64.deb ;\
+    mv ./Release/xrt_*-amd64-xrt.deb /deb_files/xrt_amd64.deb ;\
     rm -rf /tmp_clone
-RUN apt-get install -y /deb_files/xilinx*.deb
-ENV XILINX_XRT=/opt/xilinx/xrt
-ENTRYPOINT ["bash", "-c", "source /xilinx/Vitis/2021.2/settings64.sh && exec \"$@\"", "bash"]
+RUN apt-get install -y /deb_files/xrt_amd64.deb
+RUN apt-get install -y /deb_files/xilinx*.deb ; echo ""
+ENV XILINX_XRT="/opt/xilinx/xrt" XILINX_VERSION="2021.2" XILINX_PLATFORM="xilinx_u200_gen3x16_xdma_1_202110_1" 
+ENV XILINX_VITIS="/xilinx/Vitis/2021.2" XILINX_VIVADO="/xilinx/Vivado/2021.2" XILINX_SDX="/xilinx/Vitis_HLS/2021.2"
+ENV PATH="$PATH:$XILINX_XRT/bin:$XILINX_VITIS/bin" LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$XILINX_XRT/lib:$XILINX_VITIS/lib/lnx64.o" EMCONFIG_PATH="/xilinxconfig"
+ENV USER="root" LIBRARY_PATH="$LD_LIBRARY_PATH"
+RUN emconfigutil --platform $XILINX_PLATFORM --od $EMCONFIG_PATH --save-temps
+RUN update-alternatives --set c++ /usr/bin/clang++
