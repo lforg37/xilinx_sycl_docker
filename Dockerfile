@@ -17,7 +17,6 @@ RUN /Xilinx_Unified_2021.2_1021_0703_Lin64.bin -- -b Install -c /install_config.
 
 FROM install_vitis as run_env
 RUN mkdir /deb_files 
-COPY ./install_files/board_dep_files/*.deb /deb_files
 RUN mkdir /tmp_clone ;\
     cd /tmp_clone ;\
     git clone --depth=1 https://github.com/Xilinx/XRT.git ;\
@@ -27,10 +26,12 @@ RUN mkdir /tmp_clone ;\
     mv ./Release/xrt_*-amd64-xrt.deb /deb_files/xrt_amd64.deb ;\
     rm -rf /tmp_clone
 RUN apt-get install -y /deb_files/xrt_amd64.deb
-RUN apt-get install -y /deb_files/xilinx*.deb ; echo ""
-ENV XILINX_XRT="/opt/xilinx/xrt" XILINX_VERSION="2021.2" XILINX_PLATFORM="xilinx_u200_gen3x16_xdma_1_202110_1" 
+COPY ./install_files/board_dep_files/*.deb /deb_files
+RUN apt-get install -y /deb_files/xilinx*.deb ;\
+    rm -rf /root/.Xilinx
+ENV XILINX_XRT="/opt/xilinx/xrt" XILINX_VERSION="2021.2" XILINX_PLATFORM="xilinx_u200_xdma_201830_2" 
 ENV XILINX_VITIS="/xilinx/Vitis/2021.2" XILINX_VIVADO="/xilinx/Vivado/2021.2" XILINX_SDX="/xilinx/Vitis_HLS/2021.2"
-ENV PATH="$PATH:$XILINX_XRT/bin:$XILINX_VITIS/bin" LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$XILINX_XRT/lib:$XILINX_VITIS/lib/lnx64.o" EMCONFIG_PATH="/xilinxconfig"
+ENV PATH="$PATH:$XILINX_XRT/bin:$XILINX_VITIS/bin:$XILINX_VIVADO/bin" LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$XILINX_XRT/lib:$XILINX_VITIS/lib/lnx64.o" EMCONFIG_PATH="/xilinxconfig"
 ENV USER="root" LIBRARY_PATH="$LD_LIBRARY_PATH"
 RUN emconfigutil --platform $XILINX_PLATFORM --od $EMCONFIG_PATH --save-temps
 RUN update-alternatives --set c++ /usr/bin/clang++
